@@ -12,7 +12,9 @@
                         <ul>
                             <li>By {{ object.auther.full_name }}</li>
                             <li>{{ object.created_at|date:"F d, Y" }}</li>
-                            <li>8 Comments</li>
+                            {% if object.comments.values %}
+                                <li>{{ object.comments.values.count }} Comments</li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -66,7 +68,7 @@
                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                     <div class="blog__details__tags">
                                         {% for tag in object.tag.values %}
-                                            <a href="{% url 'blog:posts' %}?tag={{ tag.name }}">#{{ tag.name }}</a>
+                                            <a href="{% url 'blogs:posts' %}?tag={{ tag.name }}">#{{ tag.name }}</a>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -76,7 +78,7 @@
                             <div class="row">
                                 {% if object.get_next_by_created_at %}
                                     <div class="col-lg-6 col-md-6 col-sm-6">
-                                        <a href="{% url 'blog:detail' pk=object.get_next_by_created_at.pk %}"
+                                        <a href="{% url 'blogs:detail' pk=object.get_next_by_created_at.pk %}"
                                            class="blog__details__btns__item">
                                             <p><span class="arrow_left"></span> Previous Pod</p>
                                             <h5>{{ object.get_next_by_created_at.title }}</h5>
@@ -85,7 +87,8 @@
                                 {% endif %}
                                 {% if object.get_previous_by_created_at %}
                                     <div class="col-lg-6 col-md-6 col-sm-6 {% if not object.get_next_by_created_at %}offset-6{% endif %}">
-                                        <a href="{% url  'blog:detail' pk=object.get_previous_by_created_at.pk %}" class="blog__details__btns__item blog__details__btns__item--next">
+                                        <a href="{% url  'blogs:detail' pk=object.get_previous_by_created_at.pk %}"
+                                           class="blog__details__btns__item blog__details__btns__item--next">
                                             <p>Next Pod <span class="arrow_right"></span></p>
                                             <h5>{{ object.get_previous_by_created_at.title }}</h5>
                                         </a>
@@ -93,31 +96,45 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="blog__details__comment">
-                            <h4>Leave A Comment</h4>
-                            <form action="#">
-                                <div class="row">
-                                    <div class="col-lg-4 col-md-4">
-                                        <input type="text" placeholder="Name">
-                                    </div>
-                                    <div class="col-lg-4 col-md-4">
-                                        <input type="text" placeholder="Email">
-                                    </div>
-                                    <div class="col-lg-4 col-md-4">
-                                        <input type="text" placeholder="Phone">
-                                    </div>
-                                    <div class="col-lg-12 text-center">
-                                        <textarea placeholder="Comment"></textarea>
-                                        <button type="submit" class="site-btn">Post Comment</button>
+                        <div class="container">
+                            {% for comment in object.comments.values %}
+                                <div class="row mb-3">
+                                    <div class="col-6"><strong>{{ comment.name }}</strong></div>
+                                    <div class="col-6 text-right">{{ comment.created_at|timesince }}</div>
+                                    <div class="col-12 mt-2">
+                                        <p>
+                                            {{ comment.comment }}
+                                        </p>
                                     </div>
                                 </div>
-                            </form>
+                            {% endfor %}
+                            <div class="blog__details__comment">
+                                <h4>Leave A Comment</h4>
+                                <form action="{% url 'blogs:comment' pk=object.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4">
+                                            <input name="name" type="text" placeholder="Name">
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <input name="email" type="text" placeholder="Email">
+                                        </div>
+                                        <div class="col-lg-4 col-md-4">
+                                            <input name="phone" type="text" placeholder="Phone">
+                                        </div>
+                                        <div class="col-lg-12 text-center">
+                                            <textarea name="comment" placeholder="Comment"></textarea>
+                                            <button type="submit" class="site-btn">Post Comment</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
     <!-- Blog Details Section End -->
 
 {% endblock %}
+<!-- Blog Details Section End -->
