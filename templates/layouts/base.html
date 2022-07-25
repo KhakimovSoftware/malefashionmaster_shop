@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/slicknav.min.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+    {% block extra_css %}
+
+    {% endblock %}
 </head>
 
 <body>
@@ -31,18 +34,21 @@
     <div class="loader"></div>
 </div>
 {% include 'layouts/navbar.html' %}
+<!-- Header Section End -->
 
 {% block content %}
 
 {% endblock %}
+
 {% include 'layouts/footer.html' %}
 
 <!-- Search Begin -->
 <div class="search-model">
     <div class="h-100 d-flex align-items-center justify-content-center">
         <div class="search-close-switch">+</div>
-        <form class="search-model-form">
-            <input type="text" id="search-input" placeholder="Search here.....">
+        <form class="search-model-form" action="{% url 'shop:home' %}" method="get">
+            <input type="text" name="search" value="{{ request.GET.search }}" id="search-input"
+                   placeholder="Search here.....">
         </form>
     </div>
 </div>
@@ -59,6 +65,8 @@
 <script src="{% static 'js/mixitup.min.js' %}"></script>
 <script src="{% static 'js/owl.carousel.min.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
-</body>
+{% block extra_js %}
 
+{% endblock %}
+</body>
 </html>
