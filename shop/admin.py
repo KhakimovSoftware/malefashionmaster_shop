@@ -4,6 +4,7 @@ from django.utils.safestring import mark_safe
 from .models import ProductTagModel, ProductModel, CategoryModel, SizeModel, ColorModel, BrandModel
 from .forms import ColorModelAdminForms
 
+
 @admin.register(ProductTagModel)
 class ProductTagModelAdmin(admin.ModelAdmin):
     list_display = ['name']
@@ -46,8 +47,9 @@ class CategoryModelAdmin(admin.ModelAdmin):
 
 @admin.register(ProductModel)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ['title', 'price', 'created_at']
+    list_display = ['title', 'price', 'real_price', 'discount', 'created_at', 'sale']
     list_display_links = ['title', 'price', 'created_at']
     list_filter = ['created_at']
     search_fields = ['title', 'price']
     autocomplete_fields = ['category', 'tags', 'sizes', 'colors']
+    readonly_fields = ['real_price', 'sale']

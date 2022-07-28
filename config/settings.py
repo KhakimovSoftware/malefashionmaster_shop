@@ -51,12 +51,14 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'my_templatetag': 'shop.templatetags.my_tags',
+            }
         },
     },
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 # DATABASES = {
 #     'default': {
@@ -75,8 +77,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -119,9 +119,7 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-
 try:
     from .local_settings import *
 except ImportError:
     pass
-

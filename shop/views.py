@@ -1,3 +1,4 @@
+from django.db.models import Min, Max
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from .models import ProductModel, CategoryModel, ProductTagModel, ColorModel, BrandModel, SizeModel
@@ -5,7 +6,7 @@ from .models import ProductModel, CategoryModel, ProductTagModel, ColorModel, Br
 
 class ShopView(ListView):
     template_name = 'shop.html'
-    paginate_by = 3
+    paginate_by = 6
 
     def get_queryset(self):
         qs = ProductModel.objects.all()
@@ -39,6 +40,13 @@ class ShopView(ListView):
             qs = qs.order_by('price')
         elif sort == '-price':
             qs = qs.order_by('-price')
+        elif sort == 'sale':
+            qs = qs.filter(sale=True)
+
+        price = self.request.GET.get('price')
+        if price:
+            min, max = price.split(';')  # ['150', '325'] min >= real_price and max <= real_price
+            qs = qs.filter(real_price__gte=min, real_price__lte=max)
 
         return qs
 
@@ -49,6 +57,8 @@ class ShopView(ListView):
         data['sizes'] = SizeModel.objects.all()
         data['brands'] = BrandModel.objects.all()
         data['colors'] = ColorModel.objects.all()
+        data['min_price'], data['max_price'] = ProductModel.objects.aggregate(Min('real_price'),
+                                                                              Max('real_price')).values()
         return data
 
 
@@ -59,4 +69,4 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         data = super().get_context_data()
         data['products'] = ProductModel.objects.all().exclude(id=self.object.pk)[:4]
-        return data
+        return
