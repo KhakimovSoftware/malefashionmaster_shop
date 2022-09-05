@@ -1,7 +1,9 @@
 from django.db.models import Min, Max
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
-from .models import ProductModel, CategoryModel, ProductTagModel, ColorModel, BrandModel, SizeModel
+from .models import ProductModel, CategoryModel, ProductTagModel, ColorModel, BrandModel, SizeModel,WishlistModel
 
 
 class ShopView(ListView):
@@ -70,3 +72,31 @@ class ProductDetailView(DetailView):
         data = super().get_context_data()
         data['products'] = ProductModel.objects.all().exclude(id=self.object.pk)[:4]
         return
+
+
+@login_required
+def wishlist_view(request, pk):
+    product = get_object_or_404(ProductModel, pk=pk)
+    WishlistModel.create_or_delete(request.user, product)
+    return redirect(request.GET.get('next', '/'))
+
+
+class WishlistListView(LoginRequiredMixin,ListView):
+    template_name = 'wishlist.html'
+
+    def get_queryset(self):
+        return ProductModel.objects.filter(wishlistmodel__user_id=self.request.user)
+
+
+
+def update_cart_view(request, id):
+    cart = request.session.get('cart', [])
+
+    if id in cart:
+        cart.remove(id)
+    else:
+        cart.append(id) #[1,  2]
+
+    request.session['cart'] = cart
+    print(request.session['cart'])
+    return redirect(request.GET.get('next', '/'))
